@@ -1,12 +1,11 @@
-/* Define styles */
 /* General Styles */
 body {
     font-family: sans-serif;
     margin: 0;
     padding: 0;
     line-height: 1.6;
-    background-color: #f5f5f5; /* Light background for the body */
-    color: #333; /* Dark text for better readability */
+    background-color: #f4f4f4; /* Light Gray Background */
+    color: #333333;          /* Dark Gray Text */
 }
 
 .container {
@@ -17,14 +16,15 @@ body {
 
 /* Header */
 header {
-    background-color: #fff;
+    background-color: #673ab7;   /* Deep Purple */
+    color: #ffffff;            /* White text on header */
     padding: 1rem 0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    text-align: center; /* Add this line */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 header h1 {
-    text-align: center;
+    color: #ffffff;           /* White text on header */
 }
 
 nav ul {
@@ -33,7 +33,6 @@ nav ul {
     text-align: center;
 }
 
-
 nav ul li {
     display: inline;
     margin: 0 15px;
@@ -41,71 +40,114 @@ nav ul li {
 
 nav ul li a {
     text-decoration: none;
-    color: #333;
+    color: #ffffff;             /* White text on header */
 }
 
 /* Dropdown Menu Styles */
 nav ul li.dropdown {
-    position: relative; /* Allow the submenu to be positioned relative to this item */
+    position: relative;
 }
 
 nav ul .submenu {
-    display: none;     /* Hide the submenu by default */
-    position: absolute;/* Position the submenu absolutely */
-    top: 100%;         /* Position it below the parent item */
+    display: none;
+    position: absolute;
+    top: 100%;
     left: 0;
-    background-color: #e0e0e0; /* <-- Add your desired background color here */
+    background-color: #512DA8; /* Darker purple for submenu */
     min-width: 160px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Add a subtle shadow */
-    z-index: 1; /* Make sure it appears above other elements */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1;
 }
 
 nav ul li.dropdown:hover .submenu {
-    display: block;  /* Show the submenu when hovering over the dropdown item */
+    display: block;
 }
 
 nav ul .submenu li {
-    display: block;  /* Stack submenu items vertically */
+    display: block;
     padding: 10px 20px;
-    border-bottom: 1px solid #eee; /* Add a subtle separator between items */
+    border-bottom: 1px solid #616161; /* Darker separator for submenu */
 }
+
+nav ul .submenu li a {
+    color: #ffffff;               /* White text for submenu links */
+}
+
 
 nav ul .submenu li:last-child {
-    border-bottom: none; /* Remove the border from the last item */
+    border-bottom: none;
 }
-
 
 /* Main Content */
 main {
     padding: 20px 0;
 }
 
-.layout-sidebar{
+.layout-sidebar {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 10px;
 }
+
+/* Post Styles */
 .post {
     background-color: #fff;
     padding: 20px;
     margin-bottom: 20px;
     border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .post h2 {
     margin-top: 0;
+    color: #673AB7;         /* Deep Purple for titles */
 }
 
 .post .date {
     font-size: 0.9em;
-    color: #777;
+    color: #777777;        /* Light gray for dates */
 }
+
+/* Blog Post Content Box */
+.post-content {
+    background-color: #ffffff; /* White background for content */
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.post-content p {
+    margin-bottom: 1em;
+    padding: 10px;
+}
+
+/* Comments */
+.comments {
+    margin-top: 20px;
+}
+
+.comments ul {
+    list-style: none;
+    padding: 0;
+}
+
+.comments li {
+    margin-bottom: 1px;
+    padding: 1px;
+    border-bottom: 1px solid #eee;
+    background-color: #e3f2fd; /* Light Blue for comments */
+}
+
+.comments li p {
+    line-height: 1.2;
+    font-size: 0.9em;
+}
+
 
 /* Footer */
 footer {
-    background-color: #333;
-    color: #fff;
+    background-color: #673ab7;    /* Deep purple for footer */
+    color: #fff;                /* White text on footer */
     text-align: center;
     padding: 1rem 0;
 }
@@ -114,17 +156,26 @@ footer p {
     margin: 0;
 }
 
+/* Links */
+a {
+    color: #673AB7;         /* Deep Purple for links */
+}
+a:hover {
+    color: #512DA8;        /* Slightly darker purple on hover */
+}
+
+
 /* Responsive Design for Smaller Screens */
 @media (max-width: 768px) {
     .layout-sidebar {
-        grid-template-columns: 1fr; /* Single column on smaller screens */
+        grid-template-columns: 1fr; 
     }
 
     .sidebar {
-        grid-row: 1; /* Move sidebar above main content on smaller screens */
+        grid-row: 1;
     }
 
     .main-content {
-        grid-row: 2; /* Move main content below sidebar */
+        grid-row: 2;
     }
 }

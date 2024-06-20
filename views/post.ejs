@@ -1,0 +1,46 @@
+<article class="post">
+  <header>
+    <h2><%= post.title %></h2>
+    <p class="date">Created: <%= post.createdAt %></p>
+    <p class="date">Updated: <%= post.updatedAt %></p>
+  </header>
+
+  <% if (post.status === 'published') { %>
+    <div class="post-content">
+      <p>
+        <%- post.content.replace(/\n/g, '<br>') %>  
+      </p> 
+      
+    </div>
+
+    <section class="comments">
+      <h3>Comments</h3>
+      <% if (comments.length > 0) { %>
+        <ul>
+          <% comments.forEach(comment => { %>
+            <li>
+              <p><strong><%= comment.author %>:</strong> <%= comment.content %></p>
+            </li>
+          <% }); %>
+        </ul>
+      <% } else { %>
+        <p>No comments yet.</p>
+      <% } %>
+    </section>
+
+    <h3>Add a Comment</h3>
+    <form method="POST" action="/post/<%= post.id %>/comments">
+      <div>
+        <label for="author">Name:</label>
+        <input type="text" id="author" name="author" required />
+      </div>
+      <div>
+        <label for="content">Comment:</label>
+        <textarea id="content" name="content" rows="4" required></textarea>
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+  <% } else { %>
+    <p>This post is a draft and not available for viewing.</p>
+  <% } %>
+</article>

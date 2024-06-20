@@ -24,7 +24,8 @@ app.set("views", __dirname + "/views");
 
 //Middleware setup
 app.use(helmet());
-app.use(helmet());
+app.use(express.json()); // Parse JSON bodies
+
 try {
   setupMiddleware(app); 
 } catch (err) {
@@ -36,7 +37,7 @@ try {
 const db = require('./db');
 
 // Navigation
-require("./routes/main")(app, db);
+//require("./routes/main")(app, db);
 
 // Users Routes
 const usersRoutes = require('./routes/users'); 
@@ -45,6 +46,10 @@ app.use('/users', usersRoutes(db));
 //Blog Routes
 const blogRoutes = require('./routes/blog');
 app.use('/blog', blogRoutes(db)); 
+
+// Routes (using the combined routes/index.js file)
+const routes = require('./routes/index')(db);
+app.use('/', routes);
 
 // Error Handler Middleware (404 and others)
 app.use(errorHandler);

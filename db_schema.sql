@@ -40,5 +40,15 @@ CREATE TABLE IF NOT EXISTS blog_posts (
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- New table for comments
+CREATE TABLE IF NOT EXISTS comments (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  blog_post_id INTEGER,
+  author TEXT NOT NULL,
+  content TEXT NOT NULL,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (blog_post_id) REFERENCES blog_posts(id) ON DELETE CASCADE
+);
+
 COMMIT;
 

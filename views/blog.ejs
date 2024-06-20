@@ -28,7 +28,7 @@
       <% if (post.status === 'draft') { %>
         <% hasDraftPosts = true; %>
         <article class="post">
-          <h3><%= post.title %></h3>
+          <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
           <p class="date">Created: <%= post.createdAt %></p>
           <p class="date">Updated: <%= post.updatedAt %></p>
           <div class="content">
@@ -55,7 +55,7 @@
       <% if (post.status === 'published') { %>
         <% hasPublishedPosts = true; %>
         <article class="post">
-          <h3><%= post.title %></h3>
+          <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
           <p class="date">Created: <%= post.createdAt %></p>
           <p class="date">Updated: <%= post.updatedAt %></p>
           <div class="content">
@@ -74,7 +74,60 @@
       <p>No published posts yet.</p>
     <% } %>
   </section>
-
 <% } else { %>
   <p>No blog posts yet.</p>
 <% } %>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
