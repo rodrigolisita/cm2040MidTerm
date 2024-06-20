@@ -1,0 +1,130 @@
+/* Define styles */
+/* General Styles */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    background-color: #f5f5f5; /* Light background for the body */
+    color: #333; /* Dark text for better readability */
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    background-color: #fff;
+    padding: 1rem 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center; /* Add this line */
+}
+
+header h1 {
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+}
+
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+}
+
+/* Dropdown Menu Styles */
+nav ul li.dropdown {
+    position: relative; /* Allow the submenu to be positioned relative to this item */
+}
+
+nav ul .submenu {
+    display: none;     /* Hide the submenu by default */
+    position: absolute;/* Position the submenu absolutely */
+    top: 100%;         /* Position it below the parent item */
+    left: 0;
+    background-color: #e0e0e0; /* <-- Add your desired background color here */
+    min-width: 160px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Add a subtle shadow */
+    z-index: 1; /* Make sure it appears above other elements */
+}
+
+nav ul li.dropdown:hover .submenu {
+    display: block;  /* Show the submenu when hovering over the dropdown item */
+}
+
+nav ul .submenu li {
+    display: block;  /* Stack submenu items vertically */
+    padding: 10px 20px;
+    border-bottom: 1px solid #eee; /* Add a subtle separator between items */
+}
+
+nav ul .submenu li:last-child {
+    border-bottom: none; /* Remove the border from the last item */
+}
+
+
+/* Main Content */
+main {
+    padding: 20px 0;
+}
+
+.layout-sidebar{
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 10px;
+}
+.post {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.post h2 {
+    margin-top: 0;
+}
+
+.post .date {
+    font-size: 0.9em;
+    color: #777;
+}
+
+/* Footer */
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+footer p {
+    margin: 0;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+    .layout-sidebar {
+        grid-template-columns: 1fr; /* Single column on smaller screens */
+    }
+
+    .sidebar {
+        grid-row: 1; /* Move sidebar above main content on smaller screens */
+    }
+
+    .main-content {
+        grid-row: 2; /* Move main content below sidebar */
+    }
+}

@@ -1,0 +1,19 @@
+<div class="container">
+   <% if (blogPosts && blogPosts.length > 0) { %>
+     <h2>Published Blog Posts</h2>
+     <% blogPosts.forEach(post => { %>
+       <article class="post">
+         <h3><%= post.title %></h3>
+         <p class="date">Created: <%= post.createdAt %></p>
+         <p class="date">Updated: <%= post.updatedAt %></p>
+         <div class="content">
+           <%- post.content %>
+         </div>
+       </article>
+     <% }); %>
+   <% } else { %>
+     <p>No published blog posts yet.</p>
+   <% } %>
+ 
+   </div>
+ </div>
