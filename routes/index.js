@@ -5,20 +5,39 @@ const router = express.Router();
 module.exports = (db) => {
     router.get('/', async (req, res) => {
         try {
+          const sortOption = req.query.sort || 'createdAt'; // Get sorting option from query string, default to createdAt
+          let orderByClause;
+      
+          switch (sortOption) {
+            case 'createdAt':
+              orderByClause = 'createdAt DESC'; // Sort by creation date (newest first)
+              break;
+            case 'updatedAt':
+              orderByClause = 'updatedAt DESC'; // Sort by update date (newest first)
+              break;
+            case 'title':
+              orderByClause = 'title ASC';     // Sort by title (ascending)
+              break;
+            default:
+              orderByClause = 'createdAt DESC'; // Default to creation date if invalid option
+          }
+      
           const rows = await new Promise((resolve, reject) => {
-            db.all("SELECT * FROM blog_posts WHERE status = 'published'", (err, rows) => {
+            db.all(`SELECT * FROM blog_posts WHERE status = 'published' ORDER BY ${orderByClause}`, (err, rows) => {
               if (err) reject(err);
               else resolve(rows);
             });
           });
-          res.render('home', { title: "Home Page", blogPosts: rows });
+      
+          res.render('home', { title: "Home Page", blogPosts: rows, sortOption }); // Pass sortOption to the template
         } catch (err) {
           console.error('Database error:', err);
           res.status(500).render('error', { message: 'Database error' });
         }
       });
     
-      // About Route
+    
+          // About Route
       router.get('/about', (req, res) => {
         res.render('about', {
           // layout: './layouts/sidebar',
