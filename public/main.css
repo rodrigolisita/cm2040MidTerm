@@ -27,6 +27,18 @@ header h1 {
     color: #ffffff;           /* White text on header */
 }
 
+.sort-options {
+    /* Remove any default margins or paddings that might affect spacing */
+    margin: 0;
+    padding: 0;
+  }
+  
+  .sort-options a {
+    display: inline-block; /* Make links behave like inline elements but occupy space */
+    margin-right: 10px; /* Add space between links (optional) */
+  }
+
+
 nav ul {
     list-style: none;
     padding: 0;

@@ -3,9 +3,10 @@
     <h2>Published Blog Posts</h2>
 
     <div class="sort-options">
-      <a href="/?sort=createdAt" class="<%= sortOption === 'createdAt' ? 'active' : '' %>">Sort by Date</a>
-      <a href="/?sort=updatedAt" class="<%= sortOption === 'updatedAt' ? 'active' : '' %>">Sort by Update Date</a>
-      <a href="/?sort=title" class="<%= sortOption === 'title' ? 'active' : '' %>">Sort by Title</a>
+      <span>Sort by:</span>
+      <a href="/?sort=createdAt" class="<%= sortOption === 'createdAt' ? 'active' : '' %>">Date</a>
+      <a href="/?sort=updatedAt" class="<%= sortOption === 'updatedAt' ? 'active' : '' %>">Last Update</a>
+      <a href="/?sort=title" class="<%= sortOption === 'title' ? 'active' : '' %>">Title</a>
     </div>
 
     <% blogPosts.forEach(post => { %>

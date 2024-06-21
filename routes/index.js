@@ -79,7 +79,7 @@ module.exports = (db) => {
       
         } catch (err) {
           console.error('Database error:', err);
-          res.status(500).render('error', { message: 'Database error' });
+          res.status(500).render('error', { message: 'Database error', title: 'Error' });
         }
       });   
 
@@ -102,7 +102,7 @@ module.exports = (db) => {
       res.redirect(`/post/${blogPostId}`); // Redirect back to the post page
     } catch (err) {
       console.error(err);
-      res.status(500).render('error', { message: 'Error submitting comment' });
+      res.status(500).render('error', { message: 'Error submitting comment', title: 'Error' });
     }
   });
 

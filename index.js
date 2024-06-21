@@ -1,31 +1,47 @@
-/**
-* index.js
-* This is your main app entry point
-*/
-
-// Set up express, bodyparser and EJS
+// index.js
 require('dotenv').config();
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
-const helmet = require('helmet'); // For security
+const helmet = require('helmet');
+const session = require('express-session');
+const flash = require('connect-flash');
+const path = require('path');
+
 const app = express();
 const setupMiddleware = require('./middleware');
 const errorHandler = require('./errorHandler');
-
-
-// Static Files
-app.use(express.static(__dirname + '/public'));
+const db = require('./db');
+const usersRoutes = require('./routes/users'); 
+const blogRoutes = require('./routes/blog');
 
 // Templating Engine
 app.use(expressLayouts);
-app.set('layout','./layouts/full-width')
-app.set('view engine', 'ejs'); 
+app.set("layout", "./layouts/full-width");
+app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
 
-//Middleware setup
-app.use(helmet());
+// Security Middleware
+app.use(helmet()); // Apply Helmet for security headers
 app.use(express.json()); // Parse JSON bodies
 
+// Session Middleware (after helmet and body parser)
+app.use(session({
+  secret: process.env.SECRET_KEY,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    // Update this line for development (or use a proper HTTPS setup)
+    secure: process.env.NODE_ENV === "production",  // Secure cookie only in production
+    sameSite: 'strict',
+    httpOnly: true
+  }
+}));
+
+
+
+app.use(flash()); 
+
+// Your Custom Middleware
 try {
   setupMiddleware(app); 
 } catch (err) {
@@ -33,32 +49,49 @@ try {
   errorHandler(err, req, res, null); 
 }
 
-// Set up SQLite
-const db = require('./db');
-
-// Navigation
-//require("./routes/main")(app, db);
+// Routes
+const routes = require('./routes/index')(db);
+app.use('/', routes); // Mount the routes in the index file
 
 // Users Routes
-const usersRoutes = require('./routes/users'); 
-app.use('/users', usersRoutes(db));
+app.use("/users", usersRoutes(db));
 
-//Blog Routes
-const blogRoutes = require('./routes/blog');
-app.use('/blog', blogRoutes(db)); 
+// Serve Static Files (after other routes to avoid conflicts)
+app.use(express.static(path.join(__dirname, "public")));
 
-// Routes (using the combined routes/index.js file)
-const routes = require('./routes/index')(db);
-app.use('/', routes);
 
-// Error Handler Middleware (404 and others)
+
+
+
+
+
+// index.js (within the checkAuthentication middleware)
+
+
+
+
+
+
+
+
+
+
+
+// Blog Routes (Apply Authentication Middleware to /blog)
+  //app.use('/blog/login', blogRoutes(db)); // Login route
+  //app.use('/blog/logout', blogRoutes(db)); // Logout route
+  //app.use('/blog', checkAuthentication, blogRoutes(db)); 
+  app.use('/blog', blogRoutes(db)); 
+
+//  app.use('/blog', checkAuthentication, blogRoutes(db)); // Only authenticated users can access /blog
+
+
+
+// Error Handler Middleware (should be the last middleware)
 app.use(errorHandler);
 
 // Start Server
-//app.listen(config.port, () => {
-//    console.log(`Example app listening on port ${config.port}`);
-//  });
-app.listen(process.env.PORT || 3000, () => {
-    console.log(`Example app listening on port ${process.env.PORT || 3000}`);
-  });
-
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+ console.log(`Example app listening on port ${port}`);
+});
