@@ -11,15 +11,33 @@
 
     <% blogPosts.forEach(post => { %>
       <article class="post">
-        <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3> 
-        <div class="date">Created: <%= post.createdAt %></div> 
+        <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
+        <div class="date">Created: <%= post.createdAt %></div>
         <div class="date">Updated: <%= post.updatedAt %></div>
+        <div class="date">Author: <%= post.author %></div>
+
+        <div class="likes">
+          👍 <%= post.likes || 0 %>
+        </div>
         <div class="content">
           <%- post.content %>
         </div>
+
+        <div class="share-links">
+          <p>
+            Share this post: <a href="http://localhost:3000/post/<%= post.id %>">
+              http://localhost:3000/post/<%= post.id %>
+            </a>
+          </p>
+        </div>
+        
+        
+        
+
       </article>
     <% }); %>
   <% } else { %>
     <p>No published blog posts yet.</p>
   <% } %>
 </div>
+

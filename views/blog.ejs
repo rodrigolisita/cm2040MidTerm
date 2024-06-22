@@ -1,12 +1,16 @@
 <div class="header">
-  <h1>Add Blog Post</h1>
+  <h1>Authors Page</h1>
+  <h2>Create, Edit and Delete Posts</h2>
 </div>
+<li><a href="/users/add-user">Add Author</a></li>
+<li><a href="/users/edit-users">Edit Authors</a></li>
 
-<% if(req.session.isAuthenticated) { %>
+<% if (req.session.isAuthenticated) { %>
   <form method="GET" action="/blog/logout"> 
-      <button type="submit">Logout</button>
+    <button type="submit">Logout</button>
   </form>
-  <% } %>
+<% } %>
+
 
 <div class="post">
   <h2>Create New Blog Post</h2>
@@ -19,12 +23,22 @@
       <label for="content">Content:</label>
       <textarea id="content" name="content" required></textarea> 
     </div>
+    <div>
+      <label for="author">Author:</label>
+      <select id="author" name="author" required> 
+        <% authors.forEach(author => { %>
+          <option value="<%= author.user_name %>"><%= author.user_name %></option>
+        <% }); %>
+      </select>
+    </div>
+
+
     <button type="submit" name="publish" value="true">Publish</button>
     <button type="submit" name="draft" value="true">Save Draft</button>
   </form>
 </div>
 
-
+<div class="post">
 <% if (blogPosts && blogPosts.length > 0) { %>
   <section class="blog-posts">
     <h2>Draft Posts</h2>
@@ -36,19 +50,21 @@
           <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
           <p class="date">Created: <%= post.createdAt %></p>
           <p class="date">Updated: <%= post.updatedAt %></p>
+          <p class="date">Author: <%= post.author %></p>
           <div class="content">
             <%- post.content %>
           </div>
+          <% if (req.session.isAuthenticated) { %>
           <form action="/blog/<%= post.id %>/publish" method="POST">
             <button type="submit">Publish</button>
           </form>
           <form action="/blog/<%= post.id %>/delete" method="POST">
             <button type="submit">Delete</button>
           </form>
-
           <form action="/blog/<%= post.id %>/update" method="GET">
             <button type="submit">Update</button>
           </form>
+          <% } %>
         </article>
       <% } %>
     <% }); %>
@@ -56,7 +72,8 @@
       <p>No draft posts yet.</p>
     <% } %>
   </section>
-
+</div>
+<div class="post">
   <section class="blog-posts">
     <h2>Published Posts</h2>
     <% let hasPublishedPosts = false; %> 
@@ -67,15 +84,18 @@
           <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
           <p class="date">Created: <%= post.createdAt %></p>
           <p class="date">Updated: <%= post.updatedAt %></p>
+          <p class="date">Author: <%= post.author %></p> 
           <div class="content">
             <%- post.content %>
           </div>
+          <% if (req.session.isAuthenticated) { %>
           <form action="/blog/<%= post.id %>/move-to-draft" method="POST">
             <button type="submit">Move to Draft</button>
           </form>
           <form action="/blog/<%= post.id %>/delete" method="POST">
             <button type="submit">Delete</button>
           </form>
+          <% } %>
         </article>
       <% } %>
     <% }); %>
@@ -86,8 +106,5 @@
 <% } else { %>
   <p>No blog posts yet.</p>
 <% } %>
-
-
-
-
+</div>
 

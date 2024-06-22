@@ -8,36 +8,36 @@ BEGIN TRANSACTION;
 
 CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_name TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS email_accounts (
-    email_account_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email_address TEXT NOT NULL,
-    user_id  INT, --the user that the email account belongs to
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    user_name TEXT NOT NULL,
+    email_address TEXT NOT NULL
 );
 
 -- Insert default data (if necessary here)
 
 -- Set up three users
-INSERT INTO users ('user_name') VALUES ('Simon Star');
-INSERT INTO users ('user_name') VALUES ('Dianne Dean');
-INSERT INTO users ('user_name') VALUES ('Harry Hilbert');
+INSERT INTO users ('user_name','email_address') VALUES ('Simon Star','simon@gmail.com');
+INSERT INTO users ('user_name','email_address') VALUES ('Dianne Dean','dianne@yahoo.co.uk');
+INSERT INTO users ('user_name','email_address') VALUES ('Harry Hilbert','HH@yahoo.co.uk');
 
--- Give Simon two email addresses and Diane one, but Harry has none
-INSERT INTO email_accounts ('email_address', 'user_id') VALUES ('simon@gmail.com', 1); 
-INSERT INTO email_accounts ('email_address', 'user_id') VALUES ('simon@hotmail.com', 1); 
-INSERT INTO email_accounts ('email_address', 'user_id') VALUES ('dianne@yahoo.co.uk', 2); 
 
 -- New table for blog posts
 CREATE TABLE IF NOT EXISTS blog_posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
+    author TEXT NOT NULL,
     status TEXT NOT NULL CHECK(status IN ('published', 'draft')),
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE IF NOT EXISTS post_views (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  post_id INTEGER,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+  -- Add other columns as needed (e.g., user_id for tracking unique views)
+  FOREIGN KEY (post_id) REFERENCES blog_posts(id) ON DELETE CASCADE
 );
 
 -- New table for comments
@@ -49,6 +49,18 @@ CREATE TABLE IF NOT EXISTS comments (
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (blog_post_id) REFERENCES blog_posts(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS post_likes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  post_id INTEGER,
+  user_id INTEGER,  
+  FOREIGN KEY (post_id) REFERENCES blog_posts(id)
+);
+
+
+
+
+
 
 COMMIT;
 

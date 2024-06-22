@@ -1,16 +1,26 @@
 <article class="post">
   <header>
-    <h2><%= post.title %></h2>
+    <h1><%= post.title %></h1>
     <p class="date">Created: <%= post.createdAt %></p>
     <p class="date">Updated: <%= post.updatedAt %></p>
+    <p class="date">Author: <%= post.author %></p>
+    
   </header>
-
+  
   <% if (post.status === 'published') { %>
     <div class="post-content">
       <p>
         <%- post.content.replace(/\n/g, '<br>') %>  
       </p> 
       
+    </div>
+    
+    <div class="likes-section">
+      <p>Views: <%= views %></p>
+      <p class="like-count">Likes: <%= likes || 0 %></p>
+      <form method="POST" action="/post/<%= post.id %>/like">
+        <button type="submit">Like</button>
+      </form>
     </div>
 
     <section class="comments">
