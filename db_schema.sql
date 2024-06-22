@@ -9,15 +9,18 @@ BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_name TEXT NOT NULL,
-    email_address TEXT NOT NULL
+    email_address TEXT NOT NULL,
+    password TEXT NOT NULL
 );
 
 -- Insert default data (if necessary here)
 
 -- Set up three users
-INSERT INTO users ('user_name','email_address') VALUES ('Simon Star','simon@gmail.com');
-INSERT INTO users ('user_name','email_address') VALUES ('Dianne Dean','dianne@yahoo.co.uk');
-INSERT INTO users ('user_name','email_address') VALUES ('Harry Hilbert','HH@yahoo.co.uk');
+
+INSERT INTO users ('user_name','email_address','password') VALUES ('root','root@gmail.com','$2b$10$l4z46kD1pYxK889j2vZ.3e12/9d2vZ.3e12/9d.pYxK889j2vZ.3e');
+INSERT INTO users ('user_name','email_address','password') VALUES ('Simon Star','simon@gmail.com','test');
+INSERT INTO users ('user_name','email_address','password') VALUES ('Dianne Dean','dianne@yahoo.co.uk','test');
+INSERT INTO users ('user_name','email_address','password') VALUES ('Harry Hilbert','HH@yahoo.co.uk','test');
 
 
 -- New table for blog posts

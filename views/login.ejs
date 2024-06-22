@@ -6,6 +6,14 @@
 
 <form action="/blog/login" method="POST">
   <div>
+    <div>
+      <label for="author">Author:</label>
+      <select id="author" name="author" required> 
+        <% authors.forEach(author => { %>
+          <option value="<%= author.user_name %>"><%= author.user_name %></option>
+        <% }); %>
+      </select>
+    </div>        
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required>
   </div>

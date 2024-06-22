@@ -4,7 +4,7 @@ const router = express.Router();
 const { setupMiddleware, authenticate } = require('../middleware'); // Import both functions
 const db = require('../db'); 
 //const AUTHOR_PASSWORD = 'test'; // Or retrieve from environment variable
-
+const bcrypt = require('bcrypt'); // Import bcrypt
 
 module.exports = function (db) {
 
@@ -52,9 +52,9 @@ async function getBlogPosts(db) {
   try {
     const authors = await getAuthors(db); // Fetch authors
     const blogPosts = await getBlogPosts(db);
-
-  
-   res.render('blog', { title: 'Blog', blogPosts, req, authors: authors }); // Pass the 'authors' data to the view.
+    const userName = req.session.userName;
+      
+   res.render('blog', { title: 'Blog', blogPosts, req, authors: authors, user: userName }); // Pass the 'authors' data to the view.
    
   } catch (err) {
     console.error('Error fetching blog posts or authors:', err.message); // Add err.message
@@ -237,41 +237,63 @@ router.post("/:id/update", (req, res) => {  // Changed from router.post to route
 // -----
 
 // GET /blog/login - Display the login page (unchanged)
-router.get('/login', (req, res) => {
+router.get('/login', async (req, res) => {
   const title = req.session.title || 'Login';
+  const authors = await getAuthors(db); // Fetch authors
   res.render('login', { 
     message: req.flash('error'),
-    title: title
+    title: title,
+    authors: authors
   });
 });    
 
 
-// POST /blog/login - Handle login form submission
 router.post('/login', async (req, res) => {
-  const password = req.body.password;
-  if (password === process.env.AUTHOR_PASSWORD) {
-    req.session.isAuthenticated = true;
+  const { author, password } = req.body;
 
-    try {
-      //const blogPosts = await new Promise((resolve, reject) => {
-      //  db.all("SELECT * FROM blog_posts", (err, rows) => {
-      //    if (err) reject(err);
-      //    else resolve(rows);
-      //  });
-      //});
-      const authors = await getAuthors(db); // Fetch authors
-      const blogPosts = await getBlogPosts(db);
-      
-      res.render('blog', { title: 'Blog', blogPosts, req, authors }); // Pass the authors object to the view
-    } catch (err) {
-      console.error('Error fetching blog posts or authors:', err.message);
-      res.status(500).render('error', { message: err.message, title: 'Error' });
-    }
-  } else {
-    req.flash('error', 'Incorrect password.');
-    res.redirect('/blog/login');
+  try {
+      // 1. Fetch user from the database (within the try...catch block)
+      const user = await new Promise((resolve, reject) => {
+          db.get("SELECT * FROM users WHERE user_name = ?", [author], (err, row) => {
+              if (err) reject(err);
+              else resolve(row);
+          });
+      });
+      console.log('Comparing passwords:', password, user.password); 
+
+      const trimmedPassword = password.trim();
+      const trimmedHashedPassword = user.password.trim();
+      const match = await bcrypt.compare(trimmedPassword, trimmedHashedPassword);
+     
+      console.log("brcypt Password comparison result:", match); // Output: true or false
+    
+
+      // 2. Check if user exists and verify password (still within the try...catch)
+      //if (user && await bcrypt.compare(password, user.password)) {
+      //if (user && await bcrypt.compare(password.trim(), user.password.trim())) { // Await the comparison result
+      //if (user && match) {
+      if (user && password == user.password) {  // Using bcrypt.compare is recommended for security
+
+          req.session.isAuthenticated = true;
+          req.session.userName = user.user_name;
+          
+          // 3. Fetch posts and authors after successful authentication
+          const authors = await getAuthors(db); 
+          const blogPosts = await getBlogPosts(db);
+
+          res.render('blog', { title: 'Blog', blogPosts, req, authors, user: req.body.author }); 
+
+      } else {
+          req.flash('error', 'Invalid credentials.');
+          res.redirect('/blog/login');
+      }
+  } catch (err) {
+      // Handle potential errors from fetching the user or from the database
+      console.error('Error during login:', err);
+      res.status(500).render('error', { message: 'Error during login', error: err }); // Pass error to the view
   }
 });
+
 
 // GET /blog/logout - Log out the user
 router.get('/logout', (req, res) => {
