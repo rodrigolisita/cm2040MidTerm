@@ -3,34 +3,12 @@ const express = require('express');
 const router = express.Router();
 const { setupMiddleware, authenticate } = require('../middleware'); // Import both functions
 const db = require('../db'); 
-//const AUTHOR_PASSWORD = 'test'; // Or retrieve from environment variable
+const authRoutes = require('./auth')(db); // Require and execute authRoutes with db
+const { getAuthors } = require('./users'); // Import getAuthors
+
+
+
 const bcrypt = require('bcrypt'); // Import bcrypt
-
-module.exports = function (db) {
-
-
-// Function to fetch authors from database (this will be used in multiple places)
-async function getAuthors(db) {
-  return new Promise((resolve, reject) => {
-    db.all("SELECT user_id, user_name FROM users", (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
-  });
-}
-
-//async function getBlogPosts(db) {
-//  return new Promise((resolve, reject) => {
-//    db.all(
-//      `SELECT blog_posts.*, users.user_name AS author_name 
-//       FROM blog_posts 
-//       LEFT JOIN users ON blog_posts.author = users.user_id`,
-//      (err, rows) => {
-//        if (err) reject(err);
-//        else resolve(rows);
-//      });
-//    });
-//}
 
 async function getBlogPosts(db) {
   return new Promise((resolve, reject) => {
@@ -40,6 +18,19 @@ async function getBlogPosts(db) {
     });
     });
 }
+
+//module.exports = function (db) {
+
+
+
+
+
+
+
+
+
+
+
 
 // GET /blog - Display all blog posts with author names
 //router.get("/", async (req, res) => {
@@ -52,9 +43,9 @@ async function getBlogPosts(db) {
   try {
     const authors = await getAuthors(db); // Fetch authors
     const blogPosts = await getBlogPosts(db);
-    const userName = req.session.userName;
+    let userName = req.session.userName;
       
-   res.render('blog', { title: 'Blog', blogPosts, req, authors: authors, user: userName }); // Pass the 'authors' data to the view.
+    res.render('blog', { title: 'Blog', blogPosts, req, authors: authors, user: userName }); // Pass the 'authors' data to the view.
    
   } catch (err) {
     console.error('Error fetching blog posts or authors:', err.message); // Add err.message
@@ -70,7 +61,8 @@ router.get("/create", authenticate, async (req, res) => {
     const authors = await getAuthors(db); // Fetch authors
     res.render("create-post.ejs", {
       title: "Create New Blog Post",
-      authors: authors 
+      //authors: authors 
+      authors: userName
     });
   } catch (err) {
     console.error("Error fetching authors:", err.message); 
@@ -85,7 +77,9 @@ router.get("/create", authenticate, async (req, res) => {
       // POST /blog/create - Create a new blog post with author information
       router.post("/create", (req, res) => {
         const status = req.body.publish ? "published" : "draft";
-        const { title, content, author } = req.body;
+        //const { title, content, author } = req.body;
+        const { title, content } = req.body;
+        const author = req.session.userName;
     
         if (!title || !content || !author) {
           return res.status(400).render("error", {
@@ -181,6 +175,7 @@ router.get("/create", authenticate, async (req, res) => {
 // Edit and Update
 router.get('/:id/update',authenticate, async (req, res) => {
   const postId = req.params.id;
+  const userName = req.session.userName;
 
   try {
       // 1. Fetch the post and authors
@@ -199,12 +194,13 @@ router.get('/:id/update',authenticate, async (req, res) => {
       }
       
       // 2. Find the author's name for this post 
-      const currentAuthor = authors.find(a => a.user_id == post.author);
+      //const currentAuthor = authors.find(a => a.user_id == post.author);
 
       res.render('update', { 
           title: 'Update Blog Post', 
           post, 
           authors,
+          userName
       }); 
   } catch (err) {
       console.error('Error fetching blog post or authors:', err);
@@ -217,12 +213,29 @@ router.get('/:id/update',authenticate, async (req, res) => {
 router.post("/:id/update", (req, res) => {  // Changed from router.post to router.put
   const postId = req.params.id;
   const { title, content, author, status } = req.body;
+
+  //const newAuthor = currentAuthor + " + " + author;
+  // Fetch the existing authors for the post
+  db.get("SELECT author2 FROM blog_posts WHERE id = ?", [postId], (err, row) => {
+    if (err) {
+      console.error("Error fetching existing authors:", err);
+      return res.status(500).render("error", { message: "Database error", title: 'Error' });
+    }
+    const existingAuthors = row.author2 ? row.author2.split(', ') : []; // Split into array if there are existing authors
+    const updatedAuthors = [...existingAuthors];  // Create a copy
+
+    // Add the new author if it's not already in the list
+    if (!existingAuthors.includes(author)) {
+      updatedAuthors.push(author);
+    }
   
 
   db.run(
-      "UPDATE blog_posts SET title = ?, content = ?, author = ?, status = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?",
-      [title, content, author, status, postId],
-      function (err) {
+      "UPDATE blog_posts SET title = ?, content = ?, author2 = ?, status = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?",
+//      [title, content, author, status, postId],
+//      [title, content, newAuthor, status, postId],
+        [title, content, updatedAuthors.join(', '), status, postId], // Store as comma-separated list
+        function (err) {
           if (err) {
               console.error("Error updating blog post:", err);
               res.status(500).render("error", { message: "Database error", title: 'Error' });
@@ -232,77 +245,86 @@ router.post("/:id/update", (req, res) => {  // Changed from router.post to route
       }
   );
 });
+});
 
 
 // -----
+// Mount the authentication routes under /blog/login and /blog/logout
+router.use('/', authRoutes); // Use '/' as the base path, because the routes will have it
 
 // GET /blog/login - Display the login page (unchanged)
-router.get('/login', async (req, res) => {
-  const title = req.session.title || 'Login';
-  const authors = await getAuthors(db); // Fetch authors
-  res.render('login', { 
-    message: req.flash('error'),
-    title: title,
-    authors: authors
-  });
-});    
-
-
-router.post('/login', async (req, res) => {
-  const { author, password } = req.body;
-
-  try {
-      // 1. Fetch user from the database (within the try...catch block)
-      const user = await new Promise((resolve, reject) => {
-          db.get("SELECT * FROM users WHERE user_name = ?", [author], (err, row) => {
-              if (err) reject(err);
-              else resolve(row);
-          });
-      });
-      console.log('Comparing passwords:', password, user.password); 
-
-      const trimmedPassword = password.trim();
-      const trimmedHashedPassword = user.password.trim();
-      const match = await bcrypt.compare(trimmedPassword, trimmedHashedPassword);
-     
-      console.log("brcypt Password comparison result:", match); // Output: true or false
-    
-
-      // 2. Check if user exists and verify password (still within the try...catch)
-      //if (user && await bcrypt.compare(password, user.password)) {
-      //if (user && await bcrypt.compare(password.trim(), user.password.trim())) { // Await the comparison result
-      //if (user && match) {
-      if (user && password == user.password) {  // Using bcrypt.compare is recommended for security
-
-          req.session.isAuthenticated = true;
-          req.session.userName = user.user_name;
-          
-          // 3. Fetch posts and authors after successful authentication
-          const authors = await getAuthors(db); 
-          const blogPosts = await getBlogPosts(db);
-
-          res.render('blog', { title: 'Blog', blogPosts, req, authors, user: req.body.author }); 
-
-      } else {
-          req.flash('error', 'Invalid credentials.');
-          res.redirect('/blog/login');
-      }
-  } catch (err) {
-      // Handle potential errors from fetching the user or from the database
-      console.error('Error during login:', err);
-      res.status(500).render('error', { message: 'Error during login', error: err }); // Pass error to the view
-  }
-});
-
-
-// GET /blog/logout - Log out the user
-router.get('/logout', (req, res) => {
-  req.session.isAuthenticated = false; // Clear the authentication flag
-  req.flash('success', 'Logged out successfully!'); // Optional success message
-  res.redirect('/blog/login'); 
-});
+/* router.get('/login', async (req, res) => { */
+/*   const title = req.session.title || 'Login'; */
+/*   const authors = await getAuthors(db); // Fetch authors */
+/*   res.render('login', {  */
+/*     message: req.flash('error'), */
+/*     title: title, */
+/*     authors: authors */
+/*   }); */
+/* });     */
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+/* // GET /blog/logout - Log out the user */
+/* router.get('/logout', (req, res) => { */
+/*   req.session.isAuthenticated = false; // Clear the authentication flag */
+/*   req.flash('success', 'Logged out successfully!'); // Optional success message */
+/*   res.redirect('/blog/login');  */
+/* }); */
+/*  */
+
+
+//  return router;
+//};
+module.exports = (db) => {
+  const authRoutes = require('./auth')(db);
+  router.use('/', authRoutes);
   return router;
 };

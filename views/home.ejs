@@ -12,9 +12,9 @@
     <% blogPosts.forEach(post => { %>
       <article class="post">
         <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
-        <div class="date">Created: <%= post.createdAt %></div>
+        <div class="date">Created by <%= post.author %> on <%= post.createdAt %></div>
         <div class="date">Updated: <%= post.updatedAt %></div>
-        <div class="date">Author: <%= post.author %></div>
+        <div class="date">Contributors: <%= post.author2 %></div>
 
         <div class="likes">
           👍 <%= post.likes || 0 %>

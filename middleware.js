@@ -1,7 +1,6 @@
 // middleware.js
 const bodyParser = require("body-parser");
 const crypto = require('crypto'); // Import crypto module
-
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const helmet = require('helmet');
@@ -16,6 +15,13 @@ const errorHandler = require('./errorHandler');
 
 function setupMiddleware(app, db) { // Define the function
   try {
+
+// Generate nonce for Content Security Policy
+app.use((req, res, next) => {
+  res.locals.nonce = crypto.randomBytes(16).toString('hex');
+  next();
+});    
+    
 // Security Middleware
 app.use(helmet()); // Apply Helmet for security headers
 app.use(express.json()); // Parse JSON bodies
@@ -34,14 +40,12 @@ app.use(session({
 }));
 
 app.use(flash()); 
+app.use(bodyParser.urlencoded({ extended: true }));
 
-  app.use(bodyParser.urlencoded({ extended: true }));
-  // ...other middleware...
-  app.use(setCSP);
-  //app.use((req, res, next) => {
-  //  res.setHeader('Content-Security-Policy', `script-src 'nonce-${res.locals.nonce}' 'self';`);
-  //  next();
-  //});
+// Custom Middleware for Content Security Policy (CSP)
+app.use(setCSP);
+
+
 
 } catch (err) {
   console.error("Error setting up middleware:", err);

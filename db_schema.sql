@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Set up three users
 
-INSERT INTO users ('user_name','email_address','password') VALUES ('root','root@gmail.com','$2b$10$l4z46kD1pYxK889j2vZ.3e12/9d2vZ.3e12/9d.pYxK889j2vZ.3e');
 INSERT INTO users ('user_name','email_address','password') VALUES ('Simon Star','simon@gmail.com','test');
 INSERT INTO users ('user_name','email_address','password') VALUES ('Dianne Dean','dianne@yahoo.co.uk','test');
 INSERT INTO users ('user_name','email_address','password') VALUES ('Harry Hilbert','HH@yahoo.co.uk','test');
@@ -29,6 +28,7 @@ CREATE TABLE IF NOT EXISTS blog_posts (
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     author TEXT NOT NULL,
+    author2 TEXT,
     status TEXT NOT NULL CHECK(status IN ('published', 'draft')),
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP

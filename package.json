@@ -23,7 +23,8 @@
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.18.0",
     "helmet": "^7.1.0",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "xss": "^1.0.15"
   },
   "engines": {
     "npm": ">=8.0.0",
