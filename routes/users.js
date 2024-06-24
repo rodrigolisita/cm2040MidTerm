@@ -52,8 +52,8 @@ function usersRoutes(db){
 
   router.post("/edit-user/:id", async (req, res) => {
     const userId = req.params.id;
-    const { user_name, email_address, oldpassword, newpassword } = req.body;
-    req.session.userName = user_name;
+    let { user_name, email_address, oldpassword, newpassword } = req.body;
+    
   
     // Input validation (add more as needed)
     if (!user_name || !email_address || !oldpassword || !newpassword) {
@@ -73,17 +73,19 @@ function usersRoutes(db){
       }
       // 2. Verify the old password
       const passwordMatch = await bcrypt.compare(oldpassword, currentUser.password); // <-- await here too
-      if(currentUser.user_name == "root" ||
-        currentUser.user_name == "Simon Star" ||
-        currentUser.user_name == "Dianne Dean" ||
-        currentUser.user_name == "Harry Hilbert")
-        {if(oldpassword !== currentUser.password && !passwordMatch){
-          return res.status(401).send("Incorrect old password");
-        }
+      if(currentUser.user_name == "Simon Star" ||
+         currentUser.user_name == "Dianne Dean" ||
+         currentUser.user_name == "Harry Hilbert")
+         {
+          user_name = currentUser.user_name; //Do not change these names
+          if(oldpassword !== currentUser.password && !passwordMatch){
+            return res.status(401).send("Incorrect old password");
+          }
       }else{
         if(!passwordMatch){return res.status(401).send("Incorrect old password");}
       }
 
+     
       // 3. Hash the new password
       const hashedNewPassword = await bcrypt.hash(newpassword, 10); // <-- and await here
 
@@ -92,6 +94,7 @@ function usersRoutes(db){
       const sanitizedEmail = xss(email_address);
 
       // 5. Update the user's information
+      req.session.userName = user_name; //Update the user name for the session.
       const updateQuery = "UPDATE users SET user_name = ?, email_address = ?, password = ? WHERE user_id = ?";
 
       db.run(
@@ -113,7 +116,7 @@ function usersRoutes(db){
   });
 
   /**
-   * @desc Display all the users
+   * @desc Display all the users for edition
    */
   router.get("/edit-users", (req, res) => {
     let userName = req.session.userName;
@@ -131,6 +134,9 @@ function usersRoutes(db){
     });
   });
   
+/**
+ * @desc Display all the authors
+ */
 
   router.get("/list-authors", (req, res) => {
     db.all("SELECT * FROM users", (err, users) => {
@@ -150,39 +156,103 @@ function usersRoutes(db){
    * @desc Add a new user to the database based on data from the submitted form
    */
   router.post("/add-user", (req, res) => {
-    
     const { user_name, email_address, password } = req.body;
-
+  
     // Input validation
-    if (!user_name || !email_address || !password) { // Check if ANY field is missing
+    if (!user_name || !email_address || !password) {
       return res.status(400).send("User name, email address, and password are required.");
     }
-
+  
     // Sanitize input before inserting into the database
     const sanitizedUserName = xss(user_name);
     const sanitizedEmail = xss(email_address);
-    const hashedPassword = bcrypt.hashSync(password, 10);    
   
-    const query = "INSERT INTO users (user_name, email_address, password) VALUES (?, ?, ?);";
-
-    //db.run(query, [user_name, email_address, hashedPassword], function (err) { 
-    //Use the above for hashed passwords.
-    db.run(query,[sanitizedUserName, sanitizedEmail, hashedPassword],function (err) {
-    //db.run(query,[sanitizedUserName, sanitizedEmail, password],function (err) {
-    //db.run(query, [user_name, email_address, password], function (err) {
+    // Check if username already exists
+    db.get("SELECT * FROM users WHERE user_name = ?", [sanitizedUserName], async function(err, existingUser) {
       if (err) {
-        console.error('Database error:', err.message); 
+        console.error("Error checking for existing user:", err.message);
         return res.status(500).send("Internal Server Error");
-      } 
-      res.redirect('/users/edit-users'); 
+      }
+  
+      if (existingUser) {
+        //return res.status(400).send("Username already exists.");
+        req.flash('username', sanitizedUserName); 
+        return res.redirect('/users/user-exists');
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const query = "INSERT INTO users (user_name, email_address, password) VALUES (?, ?, ?);";
+      db.run(query, [sanitizedUserName, sanitizedEmail, hashedPassword], function (err) {
+        if (err) {
+          console.error("Database error:", err.message);
+          return res.status(500).send("Internal Server Error");
+        }
+        res.redirect("/users/edit-users");
+      });
     });
   });
 
-  router.post("/delete-user/:id", (req, res) => {
+  router.get('/user-exists', (req, res) => {
+    const username = req.flash('username');
+    res.render('user-exists.ejs', { 
+      title: "Username Already Exists", 
+      layout: './layouts/full-width',
+      name: username 
+    });
+  });
+
+  router.get('/father-users', (req, res) => {
+    const username = req.query.username;
+    res.render('father-users.ejs', { 
+      title: "User cannot be deleted", 
+      layout: './layouts/full-width',
+      username: username
+    });
+  });  
+
+  
+  
+  router.post("/delete-user/:id", async (req, res) => {
     const userId = req.params.id;
+    const {oldpassword } = req.body; // Only need the old password
+    
+    console.log("Delete request received for user ID:", userId);
 
-    console.log("Delete request received for user ID:", userId); 
+    // 1. Input validation (for password check)
+    if (!oldpassword) {
+      return res.status(400).send("Old password is required for deletion.");
+    }
+    
+    const userToDelete = await new Promise((resolve, reject) => {
+      db.get("SELECT * FROM users WHERE user_id = ?", [userId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
 
+    if (!userToDelete) {
+      return res.status(404).send("User not found");
+    }
+
+    //2. Protect Default Users
+    const protectedUsers = ["Simon Star", "Dianne Dean", "Harry Hilbert"];
+    if (protectedUsers.includes(userToDelete.user_name)) {
+      //return res.status(403).send("Cannot delete this user.");
+      //return res.redirect("/users/father-users");
+      return res.redirect(`/users/father-users?username=${encodeURIComponent(userToDelete.user_name)}`); // Encode for URL safety
+    }
+
+    // 2. Verify the password (using bcrypt if you have it, or plain text comparison if not)
+    let passwordMatch = false;
+    if (bcrypt.compareSync(oldpassword, userToDelete.password)) {
+      passwordMatch = true;
+    }    
+    
+    if (!passwordMatch) {
+      return res.status(401).send("Incorrect password");
+    }
+
+    // 3. Delete the user (only if password is correct)
     db.run("DELETE FROM users WHERE user_id = ?", [userId], function (err) {
       if (err) {
         console.error("Error deleting user:", err.message); 

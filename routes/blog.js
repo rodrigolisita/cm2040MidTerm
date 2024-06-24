@@ -45,7 +45,7 @@ async function getBlogPosts(db) {
     const blogPosts = await getBlogPosts(db);
     let userName = req.session.userName;
       
-    res.render('blog', { title: 'Blog', blogPosts, req, authors: authors, user: userName }); // Pass the 'authors' data to the view.
+    res.render('blog', { title: 'Authors Page', blogPosts, req, authors: authors, user: userName }); // Pass the 'authors' data to the view.
    
   } catch (err) {
     console.error('Error fetching blog posts or authors:', err.message); // Add err.message
