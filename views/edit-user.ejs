@@ -1,38 +1,35 @@
-<h1>Edit User <%= user.user_name %></h1>
-
-<form method="POST" action="/users/edit-user/<%= user.user_id %>">
+<div class="container">
+    <div class="post">
+        <h1>Edit User "<%= user.user_name %>"</h1>
+    </div>
     
-    <div>
-        <label for="user_name">User Name:</label>
-        <input type="text" id="user_name" name="user_name" value="<%= user.user_name %>" required>
-    </div>
-    <div>
-        <label for="email_address">Email Address:</label>
-        <input type="email" id="email_address" name="email_address" value="<%= user.email_address %>" required>
-    </div>    
-    <div>
-        <label for="oldpassword">Current Password:</label>
-        <input type="password" id="oldpassword" name="oldpassword" required>
-    </div>
-    <div>
-        <label for="newpassword">New Password:</label>
-        <input type="password" id="newpassword" name="newpassword" required>
-    </div>
+    <div class="post-content">
+        <h2>Logged user: <%= loggedUser %></h2>    
 
-    <button type="submit">Update User</button>
-</form>
-<h1>Delete User</h1>
-<form method="POST" action="/users/delete-user/<%= user.user_id %>">
-    <div>
-        <label for="user_name">User Name:</label>
-        <input type="text" id="user_name" name="user_name" value="<%= user.user_name %>" required>
-    </div>    
-    <div>
-        <label for="oldpassword">Password:</label>
-        <input type="password" id="oldpassword" name="oldpassword" required>
+        <form method="POST" action="/users/edit-user/<%= user.user_id %>">
+            <div class="post-content">
+                <label for="user_name">User Name:</label>
+                <input type="text" id="user_name" name="user_name" value="<%= user.user_name %>" required>
+            </div>
+            <div class="post-content">
+                <label for="email_address">Email Address:</label>
+                <input type="email" id="email_address" name="email_address" value="<%= user.email_address %>" required>
+            </div>    
+            <div class="post-content">
+                <label for="oldpassword">Current Password:</label>
+                <input type="password" id="oldpassword" name="oldpassword" required>
+            </div>
+            <div class="post-content">
+                <label for="newpassword">New Password:</label>
+                <input type="password" id="newpassword" name="newpassword" required>
+            </div>
+            <div class="post-content">
+                <button type="submit">Update User</button>
+            </div>
+        </form>
     </div>
-    <button type="submit">Delete User</button>
-</form>
+</div>
+
 <footer>
     <a href="/blog">Back to Authors Page</a>
 </footer>

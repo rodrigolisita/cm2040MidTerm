@@ -1,23 +1,47 @@
-<h1><%= loggedUser %> add author page</h1>
-
-
-<form method="POST" action="/users/add-user">
-  <div>
-    <label for="user_name">Author Name:</label>
-    <input type="text" id="user_name" name="user_name" required> 
+<div class="container">
+  <div class="post">
+    <h1><%= loggedUser %> add author page</h1>
+    <form method="POST" action="/users/add-user">
+      <div class="post-content">
+        <label for="user_name">Author Name:</label>
+        <input type="text" id="user_name" name="user_name" required> 
+      </div>
+    
+      <div class="post-content">
+        <label for="email_address">Email Address:</label>
+        <input type="email" id="email_address" name="email_address" required>
+      </div>
+  
+      <div class="post-content">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <div class="post-content">
+        <button type="submit">Add Author</button>
+      </div>
+    </form>
+  </div>
   </div>
 
-  <div>
-    <label for="email_address">Email Address:</label>
-    <input type="email" id="email_address" name="email_address" required>
-  </div>
-  <div>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-  </div>
 
-  <button type="submit">Add Author</button>
-</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <footer>
   <a href="/blog">Back to Authors Page</a>
   

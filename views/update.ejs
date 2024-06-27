@@ -1,35 +1,111 @@
-<h2><%=userName%>, here you can update the Blog Post</h2>
+<div class="container">
+    <h2><%= userName %>, here you can update the Blog Post "<%= post.title %>"</h2>
 
-<form action="/blog/<%= post.id %>/update" method="POST"> 
-    <label for="title">Title:</label>
-    <input type="text" id="title" name="title" value="<%= post.title %>" required> <br><br>
-
-    <label for="content">Content:</label>
-    <textarea id="content" name="content" required><%= post.content %></textarea><br><br>
-    <p>Current Author: <%=post.author %></p>
-    <p>Current Contributors: <%=post.author2 %></p>
+    <form action="/blog/<%= post.id %>/update" method="POST">
     
-
-    <div>
-        <input type="hidden" id="author" name="author" value="<%= userName %>" /> 
-        <p>New Contributor: <%= userName %></p> 
+    <div class="post">
+        <div class="post-content">
+            <label for="title">New Title:</label>
+            <input type="text" id="title" name="title" value="<%= post.title %>" required> <br><br> 
+        </div>
+    </div>  
+    
+    <div class="post">
+        <div class="post-content">
+            <label for="content">Content:</label>
+            <textarea id="content" name="content" required><%= post.content %></textarea><br> 
+        </div>
     </div>
     
-    <label for="status">Status:</label>
-    <select id="status" name="status">
-        <option value="published" <%= post.status === 'published' ? 'selected' : '' %>>Published</option>
-        <option value="draft" <%= post.status === 'draft' ? 'selected' : '' %>>Draft</option>
-    </select><br><br>
+    <div class="post">
+        <div class="post-content">
+            <h2>Author: <%= post.author %></h2>
+            <h3>Current Contributors</h3>
+            <% if (coAuthors && coAuthors.length > 0) { %>
+                <ul>
+                    <% coAuthors
+                      .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort in descending order
+                      .forEach(coAuthor => { %>
+                      <li>
+                        <%= coAuthor.author %> (Last Updated: <%= new Date(coAuthor.updated_at).toLocaleString() %>) 
+                      </li>
+                    <% }); %>
+                  </ul>
+            <% } else { %>
+            <p>No co-authors yet.</p> 
+            <% } %>
+        </div>
+    <div>
+    <!-- <input type="hidden" id="currentAuthor" name="author" value="<%= userName %>" /> -->
+    <p>"<%= userName %>" will be added as the last contributor.</p>
+    
+    <div class="post">
+        <div class="post-content">
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option value="published" <%= post.status === 'published' ? 'selected' : '' %>>Published</option>
+                <option value="draft" <%= post.status === 'draft' ? 'selected' : '' %>>Draft</option>
+            </select><br><br>
+        </div>
+        <div class="post-content">
+            <button type="submit">Update Post</button>
+        </div>
+    </div>                      
+    </form>
+</div>
 
-    
- 
-    
-    
-    
-    
-    
-    
+<footer>
+    <a href="/blog">Back to Authors Page</a> 
+  </footer>
 
-    <button type="submit">Update Post</button>
-</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

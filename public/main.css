@@ -60,6 +60,11 @@ nav ul li.dropdown {
     position: relative;
 }
 
+.likes-section {
+    color: #512DA8; /* Darker purple for submenu */
+}
+
+
 nav ul .submenu {
     display: none;
     position: absolute;
@@ -95,12 +100,6 @@ main {
     padding: 20px 0;
 }
 
-.layout-sidebar {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 10px;
-}
-
 /* Post Styles */
 .post {
     background-color: #fff;
@@ -108,11 +107,13 @@ main {
     margin-bottom: 20px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    
 }
 
 .post h2 {
     margin-top: 0;
     color: #673AB7;         /* Deep Purple for titles */
+    text-align: center; /* Add this line */
 }
 
 .post .date {
@@ -123,10 +124,36 @@ main {
 /* Blog Post Content Box */
 .post-content {
     background-color: #ffffff; /* White background for content */
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    padding: 5px;
+    border-radius: 8px; /* No border */
 }
+.post-content textarea {
+    width: calc(100% - 40px); /* Adjust 40px based on your .post-content padding */
+    box-sizing: border-box;  /* Include padding/border in element's total width */
+  }
+
+/* Table Styling */
+.post-content table {
+    width: 100%; 
+    border-collapse: collapse;
+    margin-bottom: 1px;  /* Add some space below the table */
+}
+
+.post-content table th,
+.post-content table td {
+    text-align: left;
+    padding: 1px;  /* Add padding to cells */
+    border-bottom: 1px solid #ddd;
+}
+.post-content h1{
+    margin-top: 0;
+    color: #673AB7;         /* Deep Purple for titles */
+}
+
+.post-content label {
+    display: block;     /* Make the label a block-level element */
+    margin-bottom: 5px; /* Add some space below the label */
+  }
 
 .post-content p {
     margin-bottom: 1em;

@@ -39,32 +39,26 @@ module.exports = (db) => {
       
     
         // 2. Check if user exists and verify password
-        //if (user && await bcrypt.compare(password, user.password)) {
-        //if (user && await bcrypt.compare(password.trim(), user.password.trim())) { // Await the comparison result
         if (user && (match || password == user.password)) {
         //if (user && password == user.password) {  // Using bcrypt.compare is recommended for security
     
             req.session.isAuthenticated = true;
             req.session.userName = user.user_name;
+            req.session.userId = user.user_id;
+            req.session.siteTitle = "Authors Page";
             res.redirect('/blog'); // Redirect to the blog after successful login
         
-            // 3. Fetch posts and authors after successful authentication
-            //const authors = await getAuthors(db); 
-            //const blogPosts = await getBlogPosts(db);
-            //res.render('blog', { title: 'Blog', blogPosts, req, authors, user: req.body.author }); 
-    
         } else {
             req.flash('error', 'Invalid credentials.');
             res.redirect('/blog/login');
         }
     } catch (err) {
-        // Handle potential errors from fetching the user or from the database
+        // Handle potential errors
         console.error('Error during login:', err);
         res.status(500).render('error', { message: 'Error during login', error: err }); // Pass error to the view
     }
   });  
 
-  
   // GET /blog/logout
   router.get('/logout', (req, res) => {
     req.session.isAuthenticated = false;

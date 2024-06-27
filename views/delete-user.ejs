@@ -1,0 +1,26 @@
+<div class="container">
+    <h1>Delete User "<%= user.user_name %>"</h1>
+    <div class="post">
+        <h2>Logged user: <%= loggedUser %></h2>
+
+        <div class="post">
+            
+            <form method="POST" action="/users/delete-user/<%= user.user_id %>">
+                <div class="post-content">
+                    <label for="user_name">User Name:</label>
+                    <input type="text" id="user_name" name="user_name" value="<%= user.user_name %>" readonly>
+                </div>    
+                <div class="post-content">
+                    <label for="oldpassword">Password:</label>
+                    <input type="password" id="oldpassword" name="oldpassword" required>
+                </div>
+                <div class="post-content">
+                    <button type="submit">Delete User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<footer>
+    <a href="/blog">Back to Authors Page</a>
+</footer>

@@ -1,111 +1,268 @@
-<div class="header">
-  <h1>Welcome <%= user %>. You are at the Authors Page. </h1>
-  <h2>Create, Edit and Delete Posts</h2>
-</div>
-<li><a href="/users/add-user">Add Author</a></li>
-<li><a href="/users/edit-users">Edit Authors</a></li>
-
-<% if (req.session.isAuthenticated) { %>
-  <form method="GET" action="/blog/logout"> 
-    <button type="submit">Logout</button>
-  </form>
-<% } %>
-
-
-<div class="post">
-  <h2>Create New Blog Post</h2>
-  <form action="/blog/create" method="POST">
-    <div>
-      <label for="title">Title:</label>
-      <input type="text" id="title" name="title" required>
+<div class="container">
+  <div class="post">
+    <div class="post">
+      <div class="header">
+        <h1>Welcome <%= user %>. You are at the Authors Page.</h1>
+      </div>
+      <div class="post-content">
+        <% if (req.session.isAuthenticated) { %>
+          <form method="GET" action="/blog/logout"> 
+            <button type="submit">Logout</button>
+          </form>
+          <% } %>
+          <br>
+      </div>        
+  </div>
+  <div class="post">
+    <div class="post-content">
+      <li><a href="/users/add-user">Add Author</a></li>
     </div>
-    <div>
-      <label for="content">Content:</label>
-      <textarea id="content" name="content" required></textarea> 
+    <div class="post-content">
+      <li><a href="/users/edit-users">Edit Authors</a></li>
     </div>
-    <!-- <div> -->
-      <!-- <label for="author">Author:</label> -->
-      <!-- <select id="author" name="author" required>  -->
-        <!-- <% authors.forEach(author => { %> -->
-          <!-- <option value="<%= author.user_name %>"><%= author.user_name %></option> -->
-        <!-- <% }); %> -->
-      <!-- </select> -->
-    <!-- </div> -->
-
-
-    <button type="submit" name="publish" value="true">Publish</button>
-    <button type="submit" name="draft" value="true">Save Draft</button>
-  </form>
+  </div>  
 </div>
+  
 
-<div class="post">
-<% if (blogPosts && blogPosts.length > 0) { %>
-  <section class="blog-posts">
-    <h2>Draft Posts</h2>
-    <% let hasDraftPosts = false; %>
-    <% blogPosts.forEach(post => { %>
+  <div class="post">
+    <div class="post">
+      <h2>Change Website Name at header</h2>
+      <h3>This affects the whole site</h3>
+      <form action="/blog/change" method="POST">
+        <div>
+          <p>
+            <label for="title">New Title:</label>
+            <input type="text" id="title" name="title" required>
+            <button type="submit" name="change" value="true">Change</button>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+
+  <div class="post">
+    <h2>Create, Edit and Delete Posts</h2>
+
+    <div class="post">
+      <div class="post">
+        <h2>Create New Blog Post</h2>
+      </div>
+      <form action="/blog/create" method="POST">
+        <div class="post">
+          <label for="title">Title:</label>
+          <input type="text" id="title" name="title" required>
+        </div>
+        <div class="post">
+          <div class="post-content">
+            <label for="content">Content:</label>
+            <textarea id="content" name="content" rows="4" required style="width: 100%;"></textarea> 
+          </div>
+        </div>
+        <div class="post">
+          <input type="password" name="password" placeholder="Enter password for the post" required>
+          <button type="submit" name="publish" value="true">Publish</button>
+          <button type="submit" name="draft" value="true">Save Draft</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="post">
+    <section class="blog-posts">
+      <% if (blogPosts && blogPosts.length > 0) { %>      
+      <div class="post-content">
+        <h2>Draft Posts</h2>
+      </div>
+      <% let hasDraftPosts = false; %>
+      <% blogPosts.forEach(post => { %>
       <% if (post.status === 'draft') { %>
         <% hasDraftPosts = true; %>
-        <article class="post">
+        <div class="post">
           <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
           <p class="date">Created: <%= post.createdAt %></p>
           <p class="date">Updated: <%= post.updatedAt %></p>
-          <p class="date">Author: <%= post.author %>. Contributors: <%= post.author2 %></p>
+          <p class="date">Author: <%= post.author %></p> 
+          <% if (post.coAuthors && post.coAuthors.length > 0) { %>
+          <p class="date">Contributors: 
+          <% post.coAuthors.forEach(coAuthor => { %>
+          <%= coAuthor.author %><%= coAuthor !== post.coAuthors[post.coAuthors.length - 1] ? ', ' : '' %>
+          <% }) %>
+          </p>
+          <% } %>
+          <div class="post">
+            <%- post.content %>
+          </div>
+            <% if (req.session.isAuthenticated) { %>
+              <div class="post">
+                <form action="/blog/<%= post.id %>/publish" method="POST">
+                  <button type="submit">Publish</button>
+                </form>
+              </div>
+              <div class="post">
+                <form action="/blog/<%= post.id %>/update" method="GET">
+                  <button type="submit">Edit</button>
+                </form>
+              </div>  
+              <div class="post">
+                <form action="/blog/<%= post.id %>/delete" method="POST">
+                  <div id="passwordModal">
+                    <input type="password" name="password" placeholder="Enter password to delete" required>
+                    <button type="submit">Delete</button> 
+                  </div>
+                </form>
+              </div>
+            <% } %>                
+          
+        </div>
+        <% } %>
+      <% }); %>
+      <% if (!hasDraftPosts) { %>
+        <p>No draft posts yet.</p>
+      <% } %>
+    </section>
+  </div>
+</div>
 
-          <div class="content">
-            <%- post.content %>
-          </div>
-          <% if (req.session.isAuthenticated) { %>
-          <form action="/blog/<%= post.id %>/publish" method="POST">
-            <button type="submit">Publish</button>
-          </form>
-          <form action="/blog/<%= post.id %>/delete" method="POST">
-            <button type="submit">Delete</button>
-          </form>
-          <form action="/blog/<%= post.id %>/update" method="GET">
-            <button type="submit">Update</button>
-          </form>
+<div class="container">
+  <div class="post">
+    <div class="post-content">
+      <section class="blog-posts">
+        <h2>Published Posts</h2>
+        <% let hasPublishedPosts = false; %>
+        <% blogPosts.forEach(post => { %>
+          <% if (post.status === 'published') { %>
+            <% hasPublishedPosts = true; %>
+            <article class="post">
+              <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
+              <p class="date">Created: <%= post.createdAt %></p>
+              <p class="date">Updated: <%= post.updatedAt %></p>
+              <p class="date">Author: <%= post.author %></p>
+    
+              <% if (post.coAuthors && post.coAuthors.length > 0) { %>
+              <p class="date">Contributors: 
+                  <% post.coAuthors.forEach(coAuthor => { %>
+                    <%= coAuthor.author %><%= coAuthor !== post.coAuthors[post.coAuthors.length - 1] ? ', ' : '' %>
+                  <% }) %>
+                </p>
+              <% } %>
+    
+              <div class="post">
+                <%- post.content %>
+              </div>
+              <% if (req.session.isAuthenticated) { %>
+                <div class="post">
+                  <form action="/blog/<%= post.id %>/move-to-draft" method="POST">
+                    <button type="submit">Move to Draft</button>
+                  </form>
+                </div>
+              <% } %>
+            </article>
           <% } %>
-        </article>
-      <% } %>
-    <% }); %>
-    <% if (!hasDraftPosts) { %>
-      <p>No draft posts yet.</p>
-    <% } %>
-  </section>
+        <% }); %>
+        <% if (!hasPublishedPosts) { %>
+          <p>No published posts yet.</p>
+        <% } %>
+      </section>
+    </div>
+  </div>
+  <% } else { %>
+    <p>No blog posts yet.</p>
+  <% } %>  
 </div>
-<div class="post">
-  <section class="blog-posts">
-    <h2>Published Posts</h2>
-    <% let hasPublishedPosts = false; %> 
-    <% blogPosts.forEach(post => { %>
-      <% if (post.status === 'published') { %>
-        <% hasPublishedPosts = true; %>
-        <article class="post">
-          <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
-          <p class="date">Created: <%= post.createdAt %></p>
-          <p class="date">Updated: <%= post.updatedAt %></p>
-          <p class="date">Author: <%= post.author %>. Contributors: <%= post.author2 %></p>
-          <div class="content">
-            <%- post.content %>
-          </div>
-          <% if (req.session.isAuthenticated) { %>
-          <form action="/blog/<%= post.id %>/move-to-draft" method="POST">
-            <button type="submit">Move to Draft</button>
-          </form>
-          <form action="/blog/<%= post.id %>/delete" method="POST">
-            <button type="submit">Delete</button>
-          </form>
-          <% } %>
-        </article>
-      <% } %>
-    <% }); %>
-    <% if (!hasPublishedPosts) { %>
-      <p>No published posts yet.</p>
-    <% } %>
-  </section>
-<% } else { %>
-  <p>No blog posts yet.</p>
-<% } %>
-</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

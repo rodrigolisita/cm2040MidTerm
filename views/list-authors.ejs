@@ -1,15 +1,23 @@
 <div class="post">
+  <div class="post-content">
     <h1>Our authors</h1>
-</div>
-<table style="width: 100%;">
-    <tr>
-      <th style="text-align: left;">Author Name</th>
-      <th style="text-align: left;">Email Address</th>
-    </tr>
-    <% users.forEach(user => { %>
+  </div>
+
+  <div class="post-content">
+    <table style="width: 100%;">
       <tr>
-        <td style="text-align: left;"><%= user.user_name %></td>
-        <td style="text-align: left;"><%= user.email_address %></td>
+        <th>Author Name</th>
+        <th>Email Address</th>
       </tr>
-    <% }); %>
-  </table>
+      <div class="post-content">
+      <% users.forEach(user => { 
+        %>
+        <tr> 
+         <td><%= user.user_name %></td>
+         <td><%= user.email_address %></td>
+       </tr>
+      <% }); 
+      %></div>
+    </table>
+  </div>
+</div>

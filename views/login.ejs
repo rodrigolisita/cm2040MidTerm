@@ -1,21 +1,29 @@
-<h2>Login</h2>
+<div class="container">
+  <div class="post">
+    <div class="post-content">
+      <h2>Login</h2>
+    </div>
 
-<% if (message) { %>
-  <div class="error"><%= message %></div>
-<% } %>
+    <% if (message) { %>
+      <div class="error"><%= message %></div>
+    <% } %>
+    <form action="/blog/login" method="POST">
+      <div class="post">
+        <div class="post">
+          <label for="author">Author:</label>
+          <select id="author" name="author" required> 
+            <% authors.forEach(author => { %>
+              <option value="<%= author.user_name %>"><%= author.user_name %></option>
+            <% }); %>
+          </select><br><br>
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required>
+          <button type="submit">Login</button>          
+        </div>
+        </div>
+      </div>
+    </form>
+  </div>    
+</div>
+  
 
-<form action="/blog/login" method="POST">
-  <div>
-    <div>
-      <label for="author">Author:</label>
-      <select id="author" name="author" required> 
-        <% authors.forEach(author => { %>
-          <option value="<%= author.user_name %>"><%= author.user_name %></option>
-        <% }); %>
-      </select>
-    </div>        
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-  </div>
-  <button type="submit">Login</button>
-</form>

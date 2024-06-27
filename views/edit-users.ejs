@@ -1,22 +1,30 @@
-<h1>List of Authors</h1>
-<h2>Logged user: <%= loggedUser %></h2>
-<div class="post">
-  <table>
-    <tr>
-      <th style="text-align: left;">ID</th>
-      <th style="text-align: left;">Author Name</th>
-      <th style="text-align: left;">Email Address</th>
-      <th style="text-align: left;">Action</th>
-    </tr>
-    <% users.forEach(user => { %>
-      <tr>
-        <td style="text-align: left;"><%= user.user_id %></td>
-        <td style="text-align: left;"><%= user.user_name %></td>
-        <td style="text-align: left;"><%= user.email_address %></td>
-        <td style="text-align: left;"><a href="/users/edit-user/<%= user.user_id %>">Edit</a></td> 
-      </tr>
-    <% }); %>
-  </table>
+<div class="container">
+  <div class="post">
+    <h1>List of Authors</h1>
+    <h2>Logged user: <%= loggedUser %></h2>
+  </div>
+  <div class="post">
+    <div class="post-content">
+      <table>
+        <tr>
+          <th style="text-align: left;">ID</th>
+          <th style="text-align: left;">Author Name</th>
+          <th style="text-align: left;">Email Address</th>
+          <th style="text-align: left;">Action</th>
+          <th style="text-align: left;">Delete</th>
+        </tr>
+        <% users.forEach(user => { %>
+        <tr>
+          <td style="text-align: left;"><%= user.user_id %></td>
+          <td style="text-align: left;"><%= user.user_name %></td>
+          <td style="text-align: left;"><%= user.email_address %></td>
+          <td style="text-align: left;"><a href="/users/edit-user/<%= user.user_id %>">Edit</a></td> 
+          <td style="text-align: left;"><a href="/users/delete-user/<%= user.user_id %>">Delete</a></td> 
+        </tr>
+      <% }); %>
+      </table>
+    </div>
+  </div>
 </div>
 <footer>
   <a href="/blog">Back to Authors Page</a>

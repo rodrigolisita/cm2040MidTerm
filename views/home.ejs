@@ -1,28 +1,45 @@
 <div class="container">
   <% if (blogPosts && blogPosts.length > 0) { %>
-    <h2>Published Blog Posts</h2>
+    <div class="post">
+      <h2>Published Blog Posts</h2>
+    </div>
+    
 
     <div class="sort-options">
       <span>Sort by:</span>
-      <a href="/?sort=createdAt" class="<%= sortOption === 'createdAt' ? 'active' : '' %>">Date</a>
-      <a href="/?sort=updatedAt" class="<%= sortOption === 'updatedAt' ? 'active' : '' %>">Last Update</a>
+      <a href="/?sort=createdAt" class="<%= sortOption === 'createdAt' ? 'active' : '' %>">Last Created</a>
+      <a href="/?sort=updatedAt" class="<%= sortOption === 'updatedAt' ? 'active' : '' %>">Last Updated</a>
       <a href="/?sort=title" class="<%= sortOption === 'title' ? 'active' : '' %>">Title</a>
+      <a href="/?sort=author" class="<%= sortOption === 'author' ? 'active' : '' %>">Author</a>
+      <a href="/?sort=comments" class="<%= sortOption === 'comments' ? 'active' : '' %>">Comments</a>
+      <a href="/?sort=likes" class="<%= sortOption === 'likes' ? 'active' : '' %>">Likes</a>
     </div>
-
+  
+    <div class="post-content">
     <% blogPosts.forEach(post => { %>
       <article class="post">
-        <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
+        <h1><a href="/post/<%= post.id %>"><%= post.title %></a></h1>
         <div class="date">Created by <%= post.author %> on <%= post.createdAt %></div>
         <div class="date">Updated: <%= post.updatedAt %></div>
-        <div class="date">Contributors: <%= post.author2 %></div>
+        
+        <% if (post.coAuthors && post.coAuthors.length > 0) { %>
+          <div class="date">Contributors: 
+            <% post.coAuthors.forEach(coAuthor => { %>
+              <%= coAuthor.author %><%= coAuthor !== post.coAuthors[post.coAuthors.length - 1] ? ', ' : '' %>
+            <% }); %>
+            </div>
+        <% } %>
 
         <div class="likes">
           👍 <%= post.likes || 0 %>
         </div>
         <div class="content">
-          <%- post.content %>
+          <div class="post-content">
+            <%- post.content %>
+          </div>
+          
         </div>
-
+      
         <div class="share-links">
           <p>
             Share this post: <a href="http://localhost:3000/post/<%= post.id %>">
@@ -30,14 +47,10 @@
             </a>
           </p>
         </div>
-        
-        
-        
-
-      </article>
+     </article>
     <% }); %>
   <% } else { %>
     <p>No published blog posts yet.</p>
   <% } %>
-</div>
+</div></div>
 

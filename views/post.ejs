@@ -2,55 +2,100 @@
   <header>
     <h1><%= post.title %></h1>
     <p class="date">Created by <%= post.author %> on <%= post.createdAt %> </p>
-    <p class="date">Last Updated by: <%= post.updatedAt %></p>
-    <p class="date">Contributors: <%= post.author2 %></p>
+    <% if (coAuthors && coAuthors.length > 0) { %>
+      <p class="date">Contributors:
+        <% coAuthors
+          .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort in descending order
+          .forEach(coAuthor => { %>
+            <%= coAuthor.author %> (Date: <%= new Date(coAuthor.updated_at).toLocaleString() %>)<%= coAuthor !== coAuthors[coAuthors.length - 1] ? ', ' : '' %>
+        <% }) %>
+      </p>
+    <% } %> 
+                    
+
   </header>
   
   <% if (post.status === 'published') { %>
+  <div class="post">
     <div class="post-content">
-      <p>
-        <%- post.content.replace(/\n/g, '<br>') %>  
-      </p> 
-      
+      <div class="post">
+        <p>
+          <%- post.content.replace(/\n/g, '<br>') %>  
+        </p> 
+      </div>
     </div>
     
     <div class="likes-section">
-      <p>Views: <%= views %></p>
-      <p class="like-count">Likes: <%= likes || 0 %></p>
+      <p>👀  Views: <%= views %>. 👍 Likes: <%= likes || 0 %></p>
       <form method="POST" action="/post/<%= post.id %>/like">
-        <button type="submit">Like</button>
+        <button type="submit">👍Like</button>
       </form>
     </div>
 
     <section class="comments">
-      <h3>Comments</h3>
-      <% if (comments.length > 0) { %>
+      <div class="post">
+        <h3>Comments: <%=comments.length%></h3>
+        <% if (comments.length > 0) { %>
         <ul>
-          <% comments.forEach(comment => { %>
+          <% comments
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by createdAt DESC
+            .forEach(comment => { %>
             <li>
               <p><strong><%= comment.author %>:</strong> <%= comment.content %> <span style="float: right;"><%= comment.createdAt %></span></p>
-
             </li>
-          <% }); %>
-        </ul>
-      <% } else { %>
-        <p>No comments yet.</p>
-      <% } %>
+          <% }); %>          
+          </ul>
+        <% } else { %>
+          <p>No comments yet.</p>
+        <% } %>
+      </div>
     </section>
-
-    <h3>Add a Comment</h3>
+  </div>
+  <div class="post">
+    <h1>Add a Comment</h1>
     <form method="POST" action="/post/<%= post.id %>/comments">
-      <div>
+      <div class="post">
         <label for="author">Name:</label>
         <input type="text" id="author" name="author" required />
       </div>
-      <div>
-        <label for="content">Comment:</label>
-        <textarea id="content" name="content" rows="4" required></textarea>
+      <div class="post">
+        <div class="post-content">
+          <label for="content">Comment:</label>
+          <textarea id="content" name="content" rows="4" required style="width: 100%;"></textarea>
+        </div>
+        <button type="submit">Submit</button>
       </div>
-      <button type="submit">Submit</button>
     </form>
+  </div>
   <% } else { %>
-    <p>This post is a draft and not available for viewing.</p>
+    <p>This post is a draft and not available for public viewing.</p>
+    <p class="like-count">Likes: <%= likes || 0 %> / Comments: <%=comments.length%> / Views: <%= views %> </p>
+    <div class="post-content">
+      <div class="post">
+      <p>
+        <%- post.content.replace(/\n/g, '<br>') %>  
+      </p> 
+    </div>
+      <section class="comments">
+        <h3>Comments: <%=comments.length%></h3>
+        <% if (comments.length > 0) { %>
+          <ul>
+            <% comments
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by createdAt DESC
+            .forEach(comment => { %>
+            <li>
+              <p><strong><%= comment.author %>:</strong> <%= comment.content %> <span style="float: right;"><%= comment.createdAt %></span></p>
+            </li>
+          <% }); %>          
+          </ul>
+        <% } else { %>
+          <p>No comments yet.</p>
+        <% } %>
+      </section>
+    </div>
+    <footer>
+      <h3><a href="/blog/<%= post.id %>/update">Edit: <%= post.title %></a></h3> 
+      <a href="/blog">Back to Authors Page</a> 
+    </footer>
   <% } %>
 </article>

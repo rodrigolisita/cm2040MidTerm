@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require('bcrypt'); // Import bcrypt
 const xss = require('xss'); // Install and require 'xss' if not already installed
-
+const { setupMiddleware, authenticate } = require('../middleware'); // Import both functions
 
 async function getAuthors(db) {
   return new Promise((resolve, reject) => {
@@ -46,6 +46,7 @@ function usersRoutes(db){
         layout: "./layouts/full-width",
         title: "Edit user",
         user: user,
+        loggedUser: req.session.userName
       });
     });
   });
@@ -129,7 +130,7 @@ function usersRoutes(db){
         layout: './layouts/full-width',
         title: "List users",
         users: users,
-        loggedUser: userName
+        loggedUser: req.session.userName
       });
     });
   });
@@ -209,14 +210,40 @@ function usersRoutes(db){
       username: username
     });
   });  
+  router.get('/wrong-password', (req, res) => {
+    const username = req.query.username;
+    res.render('wrong-password.ejs', { 
+      title: "Wrong Password", 
+      layout: './layouts/full-width',
+      username: username
+    });
+  });  
 
-  
+  router.get("/delete-user/:id", (req, res) => {
+    const userId = req.params.id;
+    db.get("SELECT * FROM users WHERE user_id = ?", [userId], (err, user) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).send("Internal Server Error");
+      } else if (!user) {
+        return res.status(404).send("User not found");
+      }
+      res.render("delete-user.ejs", {
+        layout: "./layouts/full-width",
+        title: "Edit user",
+        user: user,
+        loggedUser: req.session.userName
+      });
+    });
+  });
+
   
   router.post("/delete-user/:id", async (req, res) => {
     const userId = req.params.id;
+    const loggedInUserId = req.session.userId; // Get the logged-in user's ID
     const {oldpassword } = req.body; // Only need the old password
     
-    console.log("Delete request received for user ID:", userId);
+    console.log("Delete request received for user ID:", userId + " by logged user: " +  loggedInUserId);
 
     // 1. Input validation (for password check)
     if (!oldpassword) {
@@ -237,34 +264,37 @@ function usersRoutes(db){
     //2. Protect Default Users
     const protectedUsers = ["Simon Star", "Dianne Dean", "Harry Hilbert"];
     if (protectedUsers.includes(userToDelete.user_name)) {
-      //return res.status(403).send("Cannot delete this user.");
-      //return res.redirect("/users/father-users");
       return res.redirect(`/users/father-users?username=${encodeURIComponent(userToDelete.user_name)}`); // Encode for URL safety
     }
 
-    // 2. Verify the password (using bcrypt if you have it, or plain text comparison if not)
-    let passwordMatch = false;
-    if (bcrypt.compareSync(oldpassword, userToDelete.password)) {
-      passwordMatch = true;
-    }    
+    // 2. Verify the password
+    const passwordMatch = await bcrypt.compare(oldpassword, userToDelete.password); 
     
+    // 3. Delete the user (only if password is correct)
     if (!passwordMatch) {
-      return res.status(401).send("Incorrect password");
+      req.flash('username', userToDelete.user_name); 
+      return res.redirect(`/users/wrong-password?username=${encodeURIComponent(userToDelete.user_name)}`);
     }
 
-    // 3. Delete the user (only if password is correct)
-    db.run("DELETE FROM users WHERE user_id = ?", [userId], function (err) {
-      if (err) {
-        console.error("Error deleting user:", err.message); 
-        return res.status(500).send("Internal Server Error");
-      }
-      res.redirect("/users/edit-users");
-    });
+    if (loggedInUserId == parseInt(userId)) {
+      req.session.isAuthenticated = false; // Log out the user
+      req.flash("error", "You cannot delete yourself. You have been logged out.");
+      res.redirect('/blog/login'); // Redirect to login page      
+      
+    } else {
+      db.run("DELETE FROM users WHERE user_id = ?", [userId], function (err) {
+        if (err) {
+          console.error("Error deleting user:", err.message); 
+          return res.status(500).send("Internal Server Error");
+        }
+        res.redirect("/users/edit-users");
+      })
+    };
+     
+
   });
 
   return router;
-//  return { router, getAuthors }; // Expose both router and getAuthors
-
 
 };
 
