@@ -16,15 +16,12 @@ async function getAuthors(db) {
 
 
 // Export a function that takes the db connection as an argument
-//module.exports = function (db) { // Receive db from index.js
 function usersRoutes(db){
-
 
   /**
    * @desc Displays a page with a form for creating a user record
    */
   router.get("/add-user", (req, res) => {
-    //const userName = req.session.userName;
     res.render("add-user.ejs", {
       title: "Add user",
       layout: './layouts/full-width',
@@ -32,6 +29,7 @@ function usersRoutes(db){
    });
   });
 
+//Edit user form  
   router.get("/edit-user/:id", (req, res) => {
     const userId = req.params.id;
 
@@ -56,14 +54,14 @@ function usersRoutes(db){
     let { user_name, email_address, oldpassword, newpassword } = req.body;
     
   
-    // Input validation (add more as needed)
+    // Input validation
     if (!user_name || !email_address || !oldpassword || !newpassword) {
       return res.status(400).send("User name, email address, old and new passwords are required.");
     }
     try {
       // 1. Fetch the current user's data
       
-      const currentUser = await new Promise((resolve, reject) => { // <-- Now we can use await
+      const currentUser = await new Promise((resolve, reject) => {
         db.get("SELECT * FROM users WHERE user_id = ?", [userId], (err, row) => {
           if (err) reject(err);
           else resolve(row);
@@ -73,7 +71,7 @@ function usersRoutes(db){
         return res.status(404).send("User not found");
       }
       // 2. Verify the old password
-      const passwordMatch = await bcrypt.compare(oldpassword, currentUser.password); // <-- await here too
+      const passwordMatch = await bcrypt.compare(oldpassword, currentUser.password);
       if(currentUser.user_name == "Simon Star" ||
          currentUser.user_name == "Dianne Dean" ||
          currentUser.user_name == "Harry Hilbert")
@@ -88,7 +86,7 @@ function usersRoutes(db){
 
      
       // 3. Hash the new password
-      const hashedNewPassword = await bcrypt.hash(newpassword, 10); // <-- and await here
+      const hashedNewPassword = await bcrypt.hash(newpassword, 10); 
 
       // 4. Sanitize input before inserting into the database
       const sanitizedUserName = xss(user_name);
@@ -100,7 +98,6 @@ function usersRoutes(db){
 
       db.run(
         updateQuery,
-        //[sanitizedUserName, sanitizedEmail, newpassword, userId],
         [sanitizedUserName, sanitizedEmail, hashedNewPassword, userId],
         function (err) {
           if (err) {

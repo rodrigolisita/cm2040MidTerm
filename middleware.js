@@ -69,5 +69,4 @@ async function authenticate(req, res, next) {
   res.redirect('/blog/login');
 }
 
-//module.exports = setupMiddleware; // Export the function
 module.exports = { setupMiddleware, authenticate, setCSP }; // Export BOTH functions

@@ -92,8 +92,7 @@ router.post('/post/:id/like', async (req, res) => {
         try {
             const postId = req.params.id;
       
-            // Prevent duplicate likes (implement proper logic for your application)
-            // For example, you could check if the user has already liked the post
+            // Did not Prevent duplicate likes
       
             await db.run('INSERT INTO post_likes (post_id) VALUES (?)', [postId]);
       
@@ -103,7 +102,7 @@ router.post('/post/:id/like', async (req, res) => {
             res.status(500).render('error', { message: 'Error liking post' });
     }});
 
-// Comment Submission Route (updated)
+// Comment Submission Route
 router.post('/post/:id/comments', async (req, res) => {
     try {
         console.log('Comment route reached'); 
@@ -112,13 +111,12 @@ router.post('/post/:id/comments', async (req, res) => {
       const { author, content } = req.body;
       const blogPostId = req.params.id;
     
-      // Input validation and sanitization (add more robust validation in a real app)
+      // Input validation and sanitization
       if (!author || !content) {
         return res.status(400).render('error', { message: 'Author and content are required' });
       }
     
-      // Basic sanitization to prevent XSS (you'll want a more robust solution in a real application)
-      //const sanitizedContent = content.replace(/<[^>]+>/g, ''); 
+      // Basic sanitization to prevent XSS
       const sanitizedAuthor = xss(author);
       const sanitizedContent = xss(content);
     
