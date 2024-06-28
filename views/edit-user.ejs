@@ -5,11 +5,13 @@
     
     <div class="post-content">
         <h2>Logged user: <%= loggedUser %></h2>    
+        <h2>Logged user: <%= loggedUserId %></h2>    
 
         <form method="POST" action="/users/edit-user/<%= user.user_id %>">
             <div class="post-content">
                 <label for="user_name">User Name:</label>
                 <input type="text" id="user_name" name="user_name" value="<%= user.user_name %>" required>
+                <input type="text" name="loggedUserId" value="<%=loggedUserId%>" hidden>
             </div>
             <div class="post-content">
                 <label for="email_address">Email Address:</label>

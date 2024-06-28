@@ -29,10 +29,35 @@ function usersRoutes(db){
    });
   });
 
+/**
+ * @desc Display all the users for edition
+ */
+router.get("/edit-users", (req, res) => {
+  const userName = req.session.userName;
+  const userId = req.session.userId;
+
+  db.all("SELECT * FROM users", (err, users) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).send('Internal Server Error');
+    }
+    console.log(userName + " " + userId);
+    res.render("edit-users.ejs", {
+      layout: './layouts/full-width',
+      title: "List users",
+      users: users,
+      loggedUser: userName
+    });
+  });
+});
+
 //Edit user form  
   router.get("/edit-user/:id", (req, res) => {
-    const userId = req.params.id;
+    const userId = req.params.id; //User to edit
+    const loggedUserId = req.session.userId;
 
+    console.log("Request to edit user: "+ userId + " by user " + loggedUserId);
+    
     db.get("SELECT * FROM users WHERE user_id = ?", [userId], (err, user) => {
       if (err) {
         console.error("Database error:", err);
@@ -40,17 +65,22 @@ function usersRoutes(db){
       } else if (!user) {
         return res.status(404).send("User not found");
       }
-      res.render("edit-user.ejs", {
+      res.render("edit-user.ejs", { //The page to edit the user
         layout: "./layouts/full-width",
         title: "Edit user",
         user: user,
-        loggedUser: req.session.userName
+        loggedUser: req.session.userName,
+        loggedUserId: loggedUserId
       });
     });
   });
 
   router.post("/edit-user/:id", async (req, res) => {
     const userId = req.params.id;
+    const loggedUserId = req.body.loggedUserId;
+
+    console.log("Will edit user " + userId + " by user " + loggedUserId);
+
     let { user_name, email_address, oldpassword, newpassword } = req.body;
     
   
@@ -72,17 +102,17 @@ function usersRoutes(db){
       }
       // 2. Verify the old password
       const passwordMatch = await bcrypt.compare(oldpassword, currentUser.password);
-      if(currentUser.user_name == "Simon Star" ||
-         currentUser.user_name == "Dianne Dean" ||
-         currentUser.user_name == "Harry Hilbert")
-         {
-          user_name = currentUser.user_name; //Do not change these names
-          if(oldpassword !== currentUser.password && !passwordMatch){
-            return res.status(401).send("Incorrect old password");
-          }
-      }else{
-        if(!passwordMatch){return res.status(401).send("Incorrect old password");}
-      }
+//      if(currentUser.user_name == "Simon Star" ||
+//         currentUser.user_name == "Dianne Dean" ||
+//         currentUser.user_name == "Harry Hilbert")
+//         {
+//          user_name = currentUser.user_name; //Do not change these names
+//          if(oldpassword !== currentUser.password && !passwordMatch){
+//            return res.status(401).send("Incorrect old password");
+//          }
+//      }else{
+//        if(!passwordMatch){return res.status(401).send("Incorrect old password");}
+//      }
 
      
       // 3. Hash the new password
@@ -93,7 +123,10 @@ function usersRoutes(db){
       const sanitizedEmail = xss(email_address);
 
       // 5. Update the user's information
-      req.session.userName = user_name; //Update the user name for the session.
+      
+      //console.log("Will edit user " + userId + " by user " + loggedUserId);
+      if(loggedUserId == userId){req.session.userName = user_name;} //Update the user name for the session.} 
+      
       const updateQuery = "UPDATE users SET user_name = ?, email_address = ?, password = ? WHERE user_id = ?";
 
       db.run(
@@ -113,25 +146,7 @@ function usersRoutes(db){
   }
   });
 
-  /**
-   * @desc Display all the users for edition
-   */
-  router.get("/edit-users", (req, res) => {
-    let userName = req.session.userName;
-    db.all("SELECT * FROM users", (err, users) => {
-      if (err) {
-        console.error('Database error:', err);
-        return res.status(500).send('Internal Server Error');
-      }
-      res.render("edit-users.ejs", {
-        layout: './layouts/full-width',
-        title: "List users",
-        users: users,
-        loggedUser: req.session.userName
-      });
-    });
-  });
-  
+ 
 /**
  * @desc Display all the authors
  */
@@ -218,6 +233,10 @@ function usersRoutes(db){
 
   router.get("/delete-user/:id", (req, res) => {
     const userId = req.params.id;
+    const loggedUser = req.session.userId;
+    
+    console.log("Delete user " + userId + " by user " + loggedUser);
+    
     db.get("SELECT * FROM users WHERE user_id = ?", [userId], (err, user) => {
       if (err) {
         console.error("Database error:", err);
@@ -225,11 +244,12 @@ function usersRoutes(db){
       } else if (!user) {
         return res.status(404).send("User not found");
       }
+
       res.render("delete-user.ejs", {
         layout: "./layouts/full-width",
         title: "Edit user",
         user: user,
-        loggedUser: req.session.userName
+        loggedUser: req.session.user_id
       });
     });
   });
@@ -259,8 +279,8 @@ function usersRoutes(db){
     }
 
     //2. Protect Default Users
-    const protectedUsers = ["Simon Star", "Dianne Dean", "Harry Hilbert"];
-    if (protectedUsers.includes(userToDelete.user_name)) {
+    const protectedUsers = [1, 2, 3]; // Store IDs as numbers
+    if (protectedUsers.includes(userToDelete.user_id)) {
       return res.redirect(`/users/father-users?username=${encodeURIComponent(userToDelete.user_name)}`); // Encode for URL safety
     }
 
