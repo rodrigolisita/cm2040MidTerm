@@ -65,15 +65,6 @@ module.exports = (db) => {
     return rows;
 }
 
-// About Route
-router.get('/about', (req, res) => {
-  res.render('about', {
-  // layout: './layouts/sidebar',
-    title: "About"
-  });
-});
-
-
 // Root (Homepage) Route
 router.get('/', async (req, res) => {
 

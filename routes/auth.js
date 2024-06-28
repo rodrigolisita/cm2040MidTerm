@@ -31,7 +31,6 @@ module.exports = (db) => {
         });
         const hashedPassword = await bcrypt.hash(password, 10);
         const trimmedPassword = password.trim();
-        //const trimmedHashedPassword = user.password.trim();
         const trimmedHashedPassword = hashedPassword.trim();
         const match = await bcrypt.compare(trimmedPassword, trimmedHashedPassword);
        
@@ -40,8 +39,7 @@ module.exports = (db) => {
     
         // 2. Check if user exists and verify password
         if (user && (match || password == user.password)) {
-        //if (user && password == user.password) {  // Using bcrypt.compare is recommended for security
-    
+   
             req.session.isAuthenticated = true;
             req.session.userName = user.user_name;
             req.session.userId = user.user_id;
